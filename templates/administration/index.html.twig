@@ -6,6 +6,8 @@
     <h1>Espace Administration</h1>
     <p>Bienvenue dans l'espace réservé aux administrateurs.</p>
 
+    <a href="{{ path('app_user_edit') }}" class="btn btn-primary">Ajouter un utilisateur</a>
+
     <h2>Liste des utilisateurs</h2>
 
     <table>
@@ -16,6 +18,7 @@
                 <th>Prénom</th>
                 <th>E-mail</th>
                 <th>Activé</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +29,9 @@
                 <td>{{ user.prenom }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.actif ? 'Oui' : 'Non' }}</td>
+                <td>
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-secondary">Modifier</a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
