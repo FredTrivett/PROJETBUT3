@@ -24,7 +24,7 @@
         <tbody>
         {% for user in users %}
             <tr>
-                <td>{{ user.roles ? user.roles|join(', ') : '' }}</td>
+                <td>{{ user.getRoleLabels()|join(', ') }}</td>
                 <td>{{ user.nom }}</td>
                 <td>{{ user.prenom }}</td>
                 <td>{{ user.email }}</td>

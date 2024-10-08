@@ -154,4 +154,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getRoleLabels(): array
+    {
+        $roleLabels = [
+            'ROLE_USER' => 'Utilisateur',
+            'ROLE_GESTIONNAIRE' => 'Gestionnaire',
+            'ROLE_ADMIN' => 'Administrateur'
+        ];
+
+        return array_map(function ($role) use ($roleLabels) {
+            return $roleLabels[$role] ?? $role;
+        }, $this->getRoles());
+    }
 }
