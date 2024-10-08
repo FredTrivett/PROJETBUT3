@@ -5,4 +5,29 @@
 {% block body %}
     <h1>Espace Administration</h1>
     <p>Bienvenue dans l'espace réservé aux administrateurs.</p>
+
+    <h2>Liste des utilisateurs</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rôle</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>E-mail</th>
+                <th>Activé</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.roles ? user.roles|join(', ') : '' }}</td>
+                <td>{{ user.nom }}</td>
+                <td>{{ user.prenom }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.actif ? 'Oui' : 'Non' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

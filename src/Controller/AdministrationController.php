@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,10 +10,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdministrationController extends AbstractController
 {
     #[Route('/administration', name: 'app_administration')]
-    public function index(): Response
+    public function index(UserRepository $userRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $users = $userRepository->findAll();
 
-        return $this->render('administration/index.html.twig');
+        return $this->render('administration/index.html.twig', [
+            'users' => $users,
+        ]);
     }
 }
