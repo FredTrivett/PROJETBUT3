@@ -65,8 +65,9 @@ class AdministrationController extends AbstractController
             ->add('password', PasswordType::class, [
                 'required' => $isNew,
                 'label' => 'Mot de passe',
-                'attr' => ['placeholder' => 'Mot de passe'],
-                'empty_data' => ''
+                'attr' => ['placeholder' => 'Laissez vide pour ne pas changer'],
+                'empty_data' => '',
+                'mapped' => false
             ])
             ->add('actif', CheckboxType::class, [
                 'required' => false,
@@ -76,11 +77,9 @@ class AdministrationController extends AbstractController
         $form->get('roles')
             ->addModelTransformer(new CallbackTransformer(
                 function ($rolesArray) {
-                    // transform the array to a string
                     return $rolesArray;
                 },
                 function ($rolesArray) {
-                    // transform the string back to an array
                     return $rolesArray;
                 }
             ));
@@ -90,11 +89,15 @@ class AdministrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('password')->getData()) {
-                $user->setPassword($passwordHasher->hashPassword($user, $form->get('password')->getData()));
-            } elseif ($isNew) {
+            $plainPassword = $form->get('password')->getData();
+
+            if ($isNew && empty($plainPassword)) {
                 $this->addFlash('error', 'Le mot de passe est obligatoire pour un nouvel utilisateur.');
                 return $this->redirectToRoute('app_user_edit');
+            }
+
+            if (!empty($plainPassword)) {
+                $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
             }
 
             $entityManager->persist($user);
