@@ -2,28 +2,36 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>
-{% block title %}Mon Application Symfony
-{% endblock %}
-</title>
+<title>{% block title %}Welcome!{% endblock %}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+{% block stylesheets %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+
+{% endblock %}
+
+{% block javascripts %}
+    {# Add your JavaScript files here if needed #}
+{% endblock %}
 </head>
 <body>
-<header>
 <nav>
 <ul>
-<li><a href="{{path('home')}}">Accueil</a></li>
-<li><a href="{{path('about')}}">A propos</a></li>
+<li><a href="{{ path('app_home') }}">Accueil</a></li>
+{% if is_granted('ROLE_ADMIN') %}
+<li><a href="{{ path('app_administration') }}">Administration</a></li>
+{% endif %}
+{% if is_granted('ROLE_GESTIONNAIRE') %}
+<li><a href="{{ path('app_gestion') }}">Gestion</a></li>
+{% endif %}
+<li><a href="{{ path('app_mentions_legales') }}">Mentions Légales</a></li>
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+<li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+{% else %}
+<li><a href="{{ path('app_login') }}">Connexion</a></li>
+<li><a href="{{ path('app_register') }}">Inscription</a></li>
+{% endif %}
 </ul>
 </nav>
-</header>
-
-<main>
 {% block body %}{% endblock %}
-</main>
-
-<footer>
-<p>&copy; 2024 - Mon Application Symfony</p>
-</footer>
 </body>
 </html>
