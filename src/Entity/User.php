@@ -167,4 +167,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return $roleLabels[$role] ?? $role;
         }, $this->getRoles());
     }
+
+    // Add this new method
+    public function isActive(): bool
+    {
+        return $this->actif ?? false;
+    }
 }
