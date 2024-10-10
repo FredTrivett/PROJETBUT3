@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\UserRepository;
 
 #[Route('/gestion/evenements')]
 class EvenementController extends AbstractController
@@ -59,6 +60,35 @@ class EvenementController extends AbstractController
         return $this->render('evenement/edit.html.twig', [
             'evenement' => $evenement,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}/users', name: 'app_evenement_users', methods: ['GET', 'POST'])]
+    public function manageUsers(Request $request, Evenement $evenement, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        if ($request->isMethod('POST')) {
+            $userIds = $request->request->all('users');
+            $selectedUsers = $userRepository->findBy(['id' => $userIds]);
+
+            foreach ($evenement->getUsers() as $user) {
+                if (!in_array($user->getId(), $userIds)) {
+                    $evenement->removeUser($user);
+                }
+            }
+
+            foreach ($selectedUsers as $user) {
+                $evenement->addUser($user);
+            }
+
+            $entityManager->flush();
+            $this->addFlash('success', 'Les utilisateurs ont été associés avec succès.');
+            return $this->redirectToRoute('app_evenement_index');
+        }
+
+        $allUsers = $userRepository->findAll();
+        return $this->render('evenement/manage_users.html.twig', [
+            'evenement' => $evenement,
+            'allUsers' => $allUsers,
         ]);
     }
 }
