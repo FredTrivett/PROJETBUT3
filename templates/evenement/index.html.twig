@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des événements{% endblock %}
+
+{% block body %}
+    <h1>Liste des événements</h1>
+
+    <a href="{{ path('app_evenement_new') }}" class="btn btn-primary">Créer un nouvel événement</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Date de début</th>
+                <th>Date de fin</th>
+                <th>Visibilité</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evenement in evenements %}
+            <tr>
+                <td>{{ evenement.titre }}</td>
+                <td>{{ evenement.dateDebut|date('d/m/Y H:i') }}</td>
+                <td>{{ evenement.dateFin|date('d/m/Y H:i') }}</td>
+                <td>{{ evenement.visibilite ? 'Public' : 'Privé' }}</td>
+                <td>
+                    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Aucun événement trouvé</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'événement{% endblock %}
+
+{% block body %}
+    <h1>Modifier l'événement</h1>
+
+    {{ include('evenement/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+    <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+{% endblock %}
