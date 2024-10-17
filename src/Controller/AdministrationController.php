@@ -16,16 +16,34 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\CallbackTransformer;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class AdministrationController extends AbstractController
 {
     #[Route('/administration', name: 'app_administration')]
-    public function index(UserRepository $userRepository): Response
+    public function index(Request $request, UserRepository $userRepository): Response
     {
-        $users = $userRepository->findAll();
+        $page = $request->query->getInt('page', 1);
+        $limit = 10; // Nombre d'utilisateurs par page
+
+        $queryBuilder = $userRepository->createQueryBuilder('u')
+            ->orderBy('u.email', 'ASC');
+
+        $paginator = new Paginator($queryBuilder);
+        $paginator
+            ->getQuery()
+            ->setFirstResult($limit * ($page - 1))
+            ->setMaxResults($limit);
+
+        $totalItems = count($paginator);
+        $pagesCount = ceil($totalItems / $limit);
 
         return $this->render('administration/index.html.twig', [
-            'users' => $users,
+            'users' => $paginator,
+            'totalItems' => $totalItems,
+            'pagesCount' => $pagesCount,
+            'page' => $page,
+            'limit' => $limit,
         ]);
     }
 

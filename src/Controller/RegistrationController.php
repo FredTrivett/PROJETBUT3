@@ -22,15 +22,19 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var string $plainPassword */
-            $plainPassword = $form->get('plainPassword')->getData();
-
             // encode the plain password
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            $user->setPassword(
+                $userPasswordHasher->hashPassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+            );
 
-            // Set roles
-            $roles = $form->get('roles')->getData();
-            $user->setRoles($roles);
+            // Set default role to ROLE_USER
+            $user->setRoles(['ROLE_USER']);
+
+            // Set the user as active
+            $user->setActif(true);
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -41,7 +45,7 @@ class RegistrationController extends AbstractController
         }
 
         return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form,
+            'registrationForm' => $form->createView(),
         ]);
     }
 }

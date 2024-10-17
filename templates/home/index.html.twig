@@ -1,14 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
-    <h1>Welcome to the Home Page</h1>
+    <h1 class="mb-4">Bienvenue sur MonApp</h1>
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-        <p>You are logged in as {{ app.user.email }}</p>
-        <a href="{{ path('app_logout') }}">Logout</a>
+        <div class="alert alert-success" role="alert">
+            Vous êtes connecté en tant que {{ app.user.email }}
+        </div>
+        <a href="{{ path('app_logout') }}" class="btn btn-outline-primary">Déconnexion</a>
     {% else %}
-        <a href="{{ path('app_login') }}">Login</a>
-        <a href="{{ path('app_register') }}">Register</a>
+        <p class="lead mb-4">Connectez-vous ou inscrivez-vous pour accéder à toutes les fonctionnalités.</p>
+        <a href="{{ path('app_login') }}" class="btn btn-primary me-2">Connexion</a>
+        <a href="{{ path('app_register') }}" class="btn btn-outline-primary">Inscription</a>
     {% endif %}
 {% endblock %}

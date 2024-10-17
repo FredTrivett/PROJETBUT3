@@ -1,12 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gestion{% endblock %}
+{% block title %}Espace Gestion{% endblock %}
 
 {% block body %}
-    <h1>Espace Gestion</h1>
-    <p>Bienvenue dans l'espace réservé aux gestionnaires.</p>
+    <h1 class="mb-4">Espace Gestion</h1>
+    <p class="lead mb-4">Bienvenue dans l'espace réservé aux gestionnaires.</p>
     
-    <ul>
-        <li><a href="{{ path('app_evenement_index') }}">Gestion des événements</a></li>
-    </ul>
+    <h2 class="mb-3">Gestion des événements</h2>
+
+    <a href="{{ path('app_evenement_new') }}" class="btn btn-primary mb-4">Créer un nouvel événement</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Titre</th>
+                    <th>Date de début</th>
+                    <th>Date de fin</th>
+                    <th>Visibilité</th>
+                    <th>Utilisateurs associés</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for evenement in evenements %}
+                <tr>
+                    <td>{{ evenement.titre }}</td>
+                    <td>{{ evenement.dateDebut|date('d/m/Y H:i') }}</td>
+                    <td>{{ evenement.dateFin|date('d/m/Y H:i') }}</td>
+                    <td>{{ evenement.visibilite ? 'Public' : 'Privé' }}</td>
+                    <td>
+                        {% if evenement.users|length > 0 %}
+                            <ul class="list-unstyled mb-0">
+                                {% for user in evenement.users %}
+                                    <li>{{ user.email }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            Aucun utilisateur associé
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-outline-primary me-2">Modifier</a>
+                        <a href="{{ path('app_evenement_users', {'id': evenement.id}) }}" class="btn btn-sm btn-outline-info">Gérer les utilisateurs</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">Aucun événement trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

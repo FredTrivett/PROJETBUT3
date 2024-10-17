@@ -5,8 +5,15 @@
 {% block body %}
     <h1>Gérer les utilisateurs pour l'événement : {{ evenement.titre }}</h1>
 
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher un utilisateur..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div>
+    </form>
+
     <form method="post">
-        {% for user in allUsers %}
+        {% for user in users %}
             <div class="form-check">
                 <input type="checkbox" id="user_{{ user.id }}" name="users[]" value="{{ user.id }}"
                     {% if user in evenement.users %}checked{% endif %}
@@ -19,6 +26,18 @@
 
         <button type="submit" class="btn btn-primary mt-3">Enregistrer les associations</button>
     </form>
+
+    {% if pagesCount > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination">
+                {% for i in 1..pagesCount %}
+                    <li class="page-item {{ page == i ? 'active' : '' }}">
+                        <a class="page-link" href="{{ path('app_evenement_users', {'id': evenement.id, 'page': i, 'q': query}) }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
 
     <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
 {% endblock %}

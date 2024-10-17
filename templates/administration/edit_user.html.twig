@@ -3,12 +3,45 @@
 {% block title %}{{ isNew ? 'Créer' : 'Modifier' }} un utilisateur{% endblock %}
 
 {% block body %}
-    <h1>{{ isNew ? 'Créer' : 'Modifier' }} un utilisateur</h1>
+    <h1 class="mb-4">{{ isNew ? 'Créer' : 'Modifier' }} un utilisateur</h1>
 
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button type="submit" class="btn btn-primary">{{ isNew ? 'Créer' : 'Modifier' }}</button>
-    {{ form_end(form) }}
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+            <div class="mb-3">
+                {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.prenom) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.roles, 'Rôles', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.roles, {'attr': {'class': 'form-check'}}) }}
+                {{ form_errors(form.roles) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.password, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.password) }}
+            </div>
+            <div class="mb-3 form-check">
+                {{ form_widget(form.actif, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.actif, 'Actif', {'label_attr': {'class': 'form-check-label'}}) }}
+                {{ form_errors(form.actif) }}
+            </div>
+            <button type="submit" class="btn btn-primary">{{ isNew ? 'Créer' : 'Modifier' }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
 
-    <a href="{{ path('app_administration') }}">Retour à la liste</a>
+    <a href="{{ path('app_administration') }}" class="btn btn-link mt-3">Retour à la liste</a>
 {% endblock %}

@@ -3,9 +3,35 @@
 {% block title %}Nouvel événement{% endblock %}
 
 {% block body %}
-    <h1>Créer un nouvel événement</h1>
+    <h1 class="mb-4">Créer un nouvel événement</h1>
 
-    {{ include('evenement/_form.html.twig') }}
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                <div class="mb-3">
+                    {{ form_label(form.titre, 'Titre', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.titre) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.dateDebut, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.dateDebut) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.dateFin, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.dateFin) }}
+                </div>
+                <div class="mb-3 form-check">
+                    {{ form_widget(form.visibilite, {'attr': {'class': 'form-check-input'}}) }}
+                    {{ form_label(form.visibilite, 'Visibilité publique', {'label_attr': {'class': 'form-check-label'}}) }}
+                    {{ form_errors(form.visibilite) }}
+                </div>
+                <button type="submit" class="btn btn-primary">Créer l'événement</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
 
-    <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_gestion') }}" class="btn btn-link mt-3">Retour à la liste</a>
 {% endblock %}

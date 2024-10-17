@@ -5,12 +5,13 @@ namespace App\Controller;
 use App\Entity\Evenement;
 use App\Form\EvenementType;
 use App\Repository\EvenementRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\UserRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 #[Route('/gestion/evenements')]
 class EvenementController extends AbstractController
@@ -85,10 +86,35 @@ class EvenementController extends AbstractController
             return $this->redirectToRoute('app_evenement_index');
         }
 
-        $allUsers = $userRepository->findAll();
+        $query = $request->query->get('q');
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Number of users per page
+
+        $queryBuilder = $userRepository->createQueryBuilder('u')
+            ->orderBy('u.email', 'ASC');
+
+        if ($query) {
+            $queryBuilder->where('u.email LIKE :query OR u.nom LIKE :query OR u.prenom LIKE :query')
+                ->setParameter('query', '%' . $query . '%');
+        }
+
+        $paginator = new Paginator($queryBuilder);
+        $paginator
+            ->getQuery()
+            ->setFirstResult($limit * ($page - 1))
+            ->setMaxResults($limit);
+
+        $totalItems = count($paginator);
+        $pagesCount = ceil($totalItems / $limit);
+
         return $this->render('evenement/manage_users.html.twig', [
             'evenement' => $evenement,
-            'allUsers' => $allUsers,
+            'users' => $paginator,
+            'totalItems' => $totalItems,
+            'pagesCount' => $pagesCount,
+            'page' => $page,
+            'limit' => $limit,
+            'query' => $query,
         ]);
     }
 }
