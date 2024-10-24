@@ -50,6 +50,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Evenement::class, mappedBy: 'users')]
     private Collection $evenements;
 
+    #[ORM\Column(length: 20)]
+    private ?string $role = null;
+
     public function __construct()
     {
         $this->evenements = new ArrayCollection();
@@ -88,9 +91,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        if (!in_array('ROLE_USER', $roles, true)) {
+        $roles = [$this->role];
+        // Ensure that all users have ROLE_USER
+        if (!in_array('ROLE_USER', $roles)) {
             $roles[] = 'ROLE_USER';
         }
         return array_unique($roles);
@@ -99,12 +102,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param list<string> $roles
      */
-    public function setRoles(array $roles): static
+    public function setRoles(array $roles): self
     {
-        $this->roles = array_map('strtoupper', $roles);
-        if (!in_array('ROLE_USER', $this->roles, true)) {
-            $this->roles[] = 'ROLE_USER';
-        }
+        $this->role = $roles[0] ?? 'ROLE_USER';
         return $this;
     }
 
@@ -211,6 +211,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $evenement->removeUser($this);
         }
 
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
         return $this;
     }
 }

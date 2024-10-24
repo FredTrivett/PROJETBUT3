@@ -12,7 +12,9 @@ class GestionController extends AbstractController
     #[Route('/gestion', name: 'app_gestion')]
     public function index(EvenementRepository $evenementRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_GESTIONNAIRE');
+        if (!$this->isGranted('ROLE_GESTIONNAIRE')) {
+            throw $this->createAccessDeniedException('Access Denied.');
+        }
 
         return $this->render('gestion/index.html.twig', [
             'evenements' => $evenementRepository->findAll(),

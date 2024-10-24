@@ -3,28 +3,27 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\CallbackTransformer;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class AdministrationController extends AbstractController
 {
     #[Route('/administration', name: 'app_administration')]
     public function index(Request $request, UserRepository $userRepository): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Access Denied.');
+        }
+
         $page = $request->query->getInt('page', 1);
-        $limit = 10; // Nombre d'utilisateurs par page
+        $limit = 10; // Number of users per page
 
         $queryBuilder = $userRepository->createQueryBuilder('u')
             ->orderBy('u.email', 'ASC');
@@ -47,87 +46,54 @@ class AdministrationController extends AbstractController
         ]);
     }
 
-    #[Route('/administration/utilisateurs/saisie/{id}', name: 'app_user_edit', defaults: ['id' => null])]
-    public function editUser(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, ?User $user = null): Response
+    #[Route('/administration/utilisateur/{id}', name: 'app_user_edit', defaults: ['id' => null])]
+    public function editUser(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher, ?User $user = null): Response
     {
-        $isNew = !$user;
-        if ($isNew) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Access Denied.');
+        }
+
+        $isNewUser = $user === null;
+        if ($isNewUser) {
             $user = new User();
         }
 
-        $form = $this->createFormBuilder($user)
-            ->add('email', EmailType::class, [
-                'required' => true,
-                'label' => 'Email',
-                'attr' => ['placeholder' => 'Email']
-            ])
-            ->add('nom', TextType::class, [
-                'required' => true,
-                'label' => 'Nom',
-                'attr' => ['placeholder' => 'Nom']
-            ])
-            ->add('prenom', TextType::class, [
-                'required' => true,
-                'label' => 'Prénom',
-                'attr' => ['placeholder' => 'Prénom']
-            ])
-            ->add('roles', ChoiceType::class, [
-                'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                    'Gestionnaire' => 'ROLE_GESTIONNAIRE',
-                    'Administrateur' => 'ROLE_ADMIN'
-                ],
-                'multiple' => true,
-                'expanded' => true
-            ])
-            ->add('password', PasswordType::class, [
-                'required' => $isNew,
-                'label' => 'Mot de passe',
-                'attr' => ['placeholder' => 'Laissez vide pour ne pas changer'],
-                'empty_data' => '',
-                'mapped' => false
-            ])
-            ->add('actif', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Actif'
-            ]);
-
-        $form->get('roles')
-            ->addModelTransformer(new CallbackTransformer(
-                function ($rolesArray) {
-                    return $rolesArray;
-                },
-                function ($rolesArray) {
-                    return $rolesArray;
-                }
-            ));
-
-        $form = $form->getForm();
-
+        $form = $this->createForm(RegistrationFormType::class, $user, [
+            'is_edit' => !$isNewUser,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('password')->getData();
+            $plainPassword = $form->get('plainPassword')->getData();
 
-            if ($isNew && empty($plainPassword)) {
+            if ($isNewUser && empty($plainPassword)) {
                 $this->addFlash('error', 'Le mot de passe est obligatoire pour un nouvel utilisateur.');
                 return $this->redirectToRoute('app_user_edit');
             }
 
             if (!empty($plainPassword)) {
-                $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
+                $user->setPassword(
+                    $userPasswordHasher->hashPassword(
+                        $user,
+                        $plainPassword
+                    )
+                );
             }
+
+            $user->setRole($form->get('role')->getData());
+            $user->setActif($form->get('actif')->getData());
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', $isNew ? 'Utilisateur créé avec succès.' : 'Utilisateur modifié avec succès.');
+            $this->addFlash('success', $isNewUser ? 'Utilisateur créé avec succès.' : 'Utilisateur modifié avec succès.');
             return $this->redirectToRoute('app_administration');
         }
 
         return $this->render('administration/edit_user.html.twig', [
-            'form' => $form->createView(),
-            'isNew' => $isNew
+            'registrationForm' => $form->createView(),
+            'user' => $user,
+            'isNewUser' => $isNewUser,
         ]);
     }
 }

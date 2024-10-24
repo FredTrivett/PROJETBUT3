@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Administration{% endblock %}
+{% block title %}Espace Administration{% endblock %}
 
 {% block body %}
     <h1 class="mb-4">Espace Administration</h1>
@@ -25,7 +25,15 @@
             <tbody>
             {% for user in users %}
                 <tr>
-                    <td>{{ user.getRoleLabels()|join(', ') }}</td>
+                    <td>
+                        {% if 'ROLE_ADMIN' in user.roles %}
+                            Administrateur
+                        {% elseif 'ROLE_GESTIONNAIRE' in user.roles %}
+                            Gestionnaire
+                        {% else %}
+                            Utilisateur
+                        {% endif %}
+                    </td>
                     <td>{{ user.nom }}</td>
                     <td>{{ user.prenom }}</td>
                     <td>{{ user.email }}</td>

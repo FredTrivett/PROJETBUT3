@@ -1,47 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ isNew ? 'Créer' : 'Modifier' }} un utilisateur{% endblock %}
+{% block title %}{{ isNewUser ? 'Créer un utilisateur' : 'Modifier un utilisateur' }}{% endblock %}
 
 {% block body %}
-    <h1 class="mb-4">{{ isNew ? 'Créer' : 'Modifier' }} un utilisateur</h1>
+    <div class="container">
+        <h1 class="mb-4">{{ isNewUser ? 'Créer un utilisateur' : 'Modifier un utilisateur' }}</h1>
 
-    <div class="card">
-        <div class="card-body">
-            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+        {% for flash_error in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+        {% endfor %}
+
+        {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
             <div class="mb-3">
-                {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.email) }}
+                {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.email) }}
             </div>
+
             <div class="mb-3">
-                {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.nom) }}
+                {{ form_label(registrationForm.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.nom) }}
             </div>
+
             <div class="mb-3">
-                {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.prenom) }}
+                {{ form_label(registrationForm.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.prenom) }}
             </div>
+
             <div class="mb-3">
-                {{ form_label(form.roles, 'Rôles', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.roles, {'attr': {'class': 'form-check'}}) }}
-                {{ form_errors(form.roles) }}
+                {{ form_label(registrationForm.role, 'Rôle', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.role, {'attr': {'class': 'form-select'}}) }}
+                {{ form_errors(registrationForm.role) }}
             </div>
+
             <div class="mb-3">
-                {{ form_label(form.password, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.password) }}
+                {{ form_label(registrationForm.actif, 'Actif', {'label_attr': {'class': 'form-check-label'}}) }}
+                {{ form_widget(registrationForm.actif, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_errors(registrationForm.actif) }}
             </div>
-            <div class="mb-3 form-check">
-                {{ form_widget(form.actif, {'attr': {'class': 'form-check-input'}}) }}
-                {{ form_label(form.actif, 'Actif', {'label_attr': {'class': 'form-check-label'}}) }}
-                {{ form_errors(form.actif) }}
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.plainPassword, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': isNewUser ? '' : 'Laissez vide pour ne pas changer'}}) }}
+                {{ form_errors(registrationForm.plainPassword) }}
+                {% if not isNewUser %}
+                    <small class="form-text text-muted">Laissez vide pour conserver le mot de passe actuel.</small>
+                {% endif %}
             </div>
-            <button type="submit" class="btn btn-primary">{{ isNew ? 'Créer' : 'Modifier' }}</button>
-            {{ form_end(form) }}
-        </div>
+
+            {% if isNewUser %}
+                <div class="mb-3 form-check">
+                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                    {{ form_label(registrationForm.agreeTerms, 'J\'accepte les conditions d\'utilisation', {'label_attr': {'class': 'form-check-label'}}) }}
+                    {{ form_errors(registrationForm.agreeTerms) }}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">{{ isNewUser ? 'Créer' : 'Modifier' }}</button>
+        {{ form_end(registrationForm) }}
+
+        <a href="{{ path('app_administration') }}" class="btn btn-secondary mt-3">Retour à la liste des utilisateurs</a>
     </div>
-
-    <a href="{{ path('app_administration') }}" class="btn btn-link mt-3">Retour à la liste</a>
 {% endblock %}
