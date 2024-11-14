@@ -35,6 +35,8 @@ security:
         - { path: ^/administration, roles: ROLE_ADMIN }
         - { path: ^/gestion, roles: ROLE_GESTIONNAIRE }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/send-email, roles: PUBLIC_ACCESS }
+        - { path: ^/email-form, roles: PUBLIC_ACCESS }
 
     role_hierarchy:
         ROLE_GESTIONNAIRE: ROLE_USER

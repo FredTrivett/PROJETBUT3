@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Send Test Email</h1>
+    <form action="{{ path('send_email') }}" method="post">
+        <button type="submit">Send Email</button>
+    </form>
+{% endblock %}
