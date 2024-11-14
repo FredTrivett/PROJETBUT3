@@ -15,7 +15,7 @@ class EmailService
         string $to,
         string $subject,
         string $htmlContent,
-        string $from = 'no-reply@fredtrivett.com'
+        string $from = 'onboarding@resend.dev'
     ): void {
         $email = (new Email())
             ->from($from)
